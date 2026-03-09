@@ -67,6 +67,11 @@ const routes = [
         path: 'relatorio-tickets',
         name: 'relatorio-tickets',
         component: () => import('pages/relatorios/RelatorioTickets')
+      },
+      {
+        path: 'pesquisa-satisfacao',
+        name: 'pesquisa-satisfacao',
+        component: () => import('pages/relatorios/RelatorioPesquisaSatisfacao.vue')
       }
     ]
   },

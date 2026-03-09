@@ -61,6 +61,13 @@ const AdminCreateTenantService = async ({
     { key: "rejectCalls", value: "disabled" },
     { key: "hubToken", value: "disabled" },
     { key: "openAiKey", value: "" },
+    { key: "satisfactionSurveyEnabled", value: "disabled" },
+    { key: "satisfactionSurveyDelayMinutes", value: "0" },
+    { key: "satisfactionSurveySendScope", value: "all" },
+    { key: "satisfactionSurveyQueueIds", value: "[]" },
+    { key: "satisfactionSurveyLowRatingFollowupEnabled", value: "disabled" },
+    { key: "satisfactionSurveyLowRatingFollowupMessage", value: "" },
+    { key: "satisfactionSurveyMessage", value: "" },
     {
       key: "callRejectMessage",
       value:

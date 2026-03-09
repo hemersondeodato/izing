@@ -4,6 +4,7 @@ import isAuth from "../middleware/isAuth";
 import * as StatisticsController from "../controllers/StatisticsController";
 import * as StatisticsPerUsersController from "../controllers/Statistics/StatisticsPerUsersController";
 import * as DashController from "../controllers/Statistics/DashController";
+import * as SatisfactionSurveyController from "../controllers/SatisfactionSurveyController";
 
 const statisticsRoutes = express.Router();
 
@@ -59,6 +60,12 @@ statisticsRoutes.get(
   "/statistics-tickets-queue",
   isAuth,
   DashController.getDashTicketsQueue
+);
+
+statisticsRoutes.get(
+  "/statistics-satisfaction-surveys",
+  isAuth,
+  SatisfactionSurveyController.report
 );
 
 export default statisticsRoutes;

@@ -195,12 +195,169 @@
         </div>
       </div>
 
+      <q-item-label
+        caption
+        class="q-mt-xl q-pl-sm"
+      >Módulo: Pesquisa de Satisfação</q-item-label>
+      <q-separator spaced />
+
+      <q-item
+        tag="label"
+        v-ripple
+      >
+        <q-item-section>
+          <q-item-label>Ativar pesquisa de satisfação</q-item-label>
+          <q-item-label caption>Quando habilitado, o sistema poderá enviar automaticamente a pesquisa após o encerramento do ticket.</q-item-label>
+        </q-item-section>
+        <q-item-section avatar>
+          <q-toggle
+            v-model="satisfactionSurveyEnabled"
+            false-value="disabled"
+            true-value="enabled"
+            checked-icon="check"
+            keep-color
+            :color="satisfactionSurveyEnabled === 'enabled' ? 'green' : 'negative'"
+            size="md"
+            unchecked-icon="clear"
+            @input="atualizarConfiguracao('satisfactionSurveyEnabled')"
+          />
+        </q-item-section>
+      </q-item>
+
+      <div
+        v-if="satisfactionSurveyEnabled === 'enabled'"
+        class="row q-col-gutter-md q-px-md q-pb-md"
+      >
+        <div class="col-xs-12 col-md-4">
+          <q-input
+            v-model.number="satisfactionSurveyDelayMinutes"
+            type="number"
+            min="0"
+            dense
+            outlined
+            rounded
+            label="Tempo para envio (minutos)"
+            @input="atualizarConfiguracao('satisfactionSurveyDelayMinutes')"
+          />
+        </div>
+
+        <div class="col-xs-12 col-md-4">
+          <q-select
+            v-model="satisfactionSurveySendScope"
+            dense
+            outlined
+            rounded
+            emit-value
+            map-options
+            :options="satisfactionSurveyScopeOptions"
+            label="Abrangência do envio"
+            @input="atualizarConfiguracao('satisfactionSurveySendScope')"
+          />
+        </div>
+
+        <div
+          v-if="satisfactionSurveySendScope === 'selected'"
+          class="col-xs-12 col-md-4"
+        >
+          <q-select
+            v-model="satisfactionSurveyQueueIds"
+            :options="queues"
+            option-value="id"
+            option-label="queue"
+            emit-value
+            map-options
+            multiple
+            use-chips
+            dense
+            outlined
+            rounded
+            label="Filas permitidas"
+            @input="atualizarConfiguracao('satisfactionSurveyQueueIds')"
+          />
+        </div>
+
+        <div class="col-12">
+          <q-input
+            v-model="satisfactionSurveyMessage"
+            type="textarea"
+            autogrow
+            dense
+            outlined
+            label="Mensagem da pesquisa"
+            input-style="min-height: 12vh;"
+            debounce="700"
+            @input="atualizarConfiguracao('satisfactionSurveyMessage')"
+          />
+        </div>
+
+        <div class="col-12">
+          <q-item
+            tag="label"
+            v-ripple
+            class="q-px-none"
+          >
+            <q-item-section>
+              <q-item-label>Mensagem complementar para notas baixas</q-item-label>
+              <q-item-label caption>Quando o cliente responder 1 ou 2, o sistema poderá solicitar mais detalhes.</q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+              <q-toggle
+                v-model="satisfactionSurveyLowRatingFollowupEnabled"
+                false-value="disabled"
+                true-value="enabled"
+                checked-icon="check"
+                keep-color
+                :color="satisfactionSurveyLowRatingFollowupEnabled === 'enabled' ? 'green' : 'negative'"
+                size="md"
+                unchecked-icon="clear"
+                @input="atualizarConfiguracao('satisfactionSurveyLowRatingFollowupEnabled')"
+              />
+            </q-item-section>
+          </q-item>
+        </div>
+
+        <div
+          v-if="satisfactionSurveyLowRatingFollowupEnabled === 'enabled'"
+          class="col-12"
+        >
+          <q-input
+            v-model="satisfactionSurveyLowRatingFollowupMessage"
+            type="textarea"
+            autogrow
+            dense
+            outlined
+            label="Mensagem complementar para notas 1 e 2"
+            input-style="min-height: 8vh;"
+            debounce="700"
+            @input="atualizarConfiguracao('satisfactionSurveyLowRatingFollowupMessage')"
+          />
+        </div>
+      </div>
+
     </q-list>
   </div>
 </template>
 <script>
 import { ListarChatFlow } from 'src/service/chatFlow'
+import { ListarFilas } from 'src/service/filas'
 import { ListarConfiguracoes, AlterarConfiguracao } from 'src/service/configuracoes'
+
+const defaultSatisfactionSurveyMessage = `Olá! Seu atendimento foi finalizado.
+
+Gostaríamos de avaliar sua experiência.
+Por favor, responda com uma nota de 1 a 5:
+
+1 - Muito ruim
+2 - Ruim
+3 - Regular
+4 - Bom
+5 - Excelente
+
+Sua opinião é muito importante para nós.`
+
+const defaultLowRatingFollowupMessage = `Sentimos muito pela sua experiência.
+Se desejar, nos conte o que aconteceu para que possamos melhorar.`
+
 export default {
   name: 'IndexConfiguracoes',
   data () {
@@ -208,6 +365,7 @@ export default {
       userProfile: 'user',
       configuracoes: [],
       listaChatFlow: [],
+      queues: [],
       NotViewAssignedTickets: null,
       NotViewTicketsChatBot: null,
       DirectTicketsToWallets: null,
@@ -217,7 +375,18 @@ export default {
       callRejectMessage: '',
       hubToken: '',
       openAiKey: '',
-      ConnectionHubToken: ''
+      ConnectionHubToken: '',
+      satisfactionSurveyEnabled: 'disabled',
+      satisfactionSurveyDelayMinutes: 0,
+      satisfactionSurveyMessage: defaultSatisfactionSurveyMessage,
+      satisfactionSurveySendScope: 'all',
+      satisfactionSurveyQueueIds: [],
+      satisfactionSurveyLowRatingFollowupEnabled: 'disabled',
+      satisfactionSurveyLowRatingFollowupMessage: defaultLowRatingFollowupMessage,
+      satisfactionSurveyScopeOptions: [
+        { label: 'Todos os atendimentos', value: 'all' },
+        { label: 'Apenas filas selecionadas', value: 'selected' }
+      ]
     }
   },
   methods: {
@@ -229,6 +398,16 @@ export default {
         if (el.key === 'botTicketActive' && el.value) {
           value = +el.value
         }
+        if (el.key === 'satisfactionSurveyDelayMinutes' && el.value !== null) {
+          value = Number(el.value)
+        }
+        if (el.key === 'satisfactionSurveyQueueIds') {
+          try {
+            value = el.value ? JSON.parse(el.value) : []
+          } catch (error) {
+            value = []
+          }
+        }
         this.$data[el.key] = value
       })
     },
@@ -236,10 +415,16 @@ export default {
       const { data } = await ListarChatFlow()
       this.listaChatFlow = data.chatFlow
     },
+    async listarFilas () {
+      const { data } = await ListarFilas()
+      this.queues = data
+    },
     async atualizarConfiguracao (key) {
       const params = {
         key,
-        value: this.$data[key]
+        value: key === 'satisfactionSurveyQueueIds'
+          ? JSON.stringify(this.$data[key] || [])
+          : String(this.$data[key] !== undefined && this.$data[key] !== null ? this.$data[key] : '')
       }
       try {
         await AlterarConfiguracao(params)
@@ -255,7 +440,9 @@ export default {
         })
       } catch (error) {
         console.error('error - AlterarConfiguracao', error)
-        this.$data[key] = this.$data[key] === 'enabled' ? 'disabled' : 'enabled'
+        if (['enabled', 'disabled'].includes(this.$data[key])) {
+          this.$data[key] = this.$data[key] === 'enabled' ? 'disabled' : 'enabled'
+        }
         this.$notificarErro('Ocorreu um erro!', error)
       }
     }
@@ -264,6 +451,7 @@ export default {
     this.userProfile = localStorage.getItem('profile')
     await this.listarConfiguracoes()
     await this.listarChatFlow()
+    await this.listarFilas()
   }
 }
 </script>

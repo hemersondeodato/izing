@@ -23,5 +23,10 @@
       "name": "relatorio-tickets",
       "titulo": "Relatório dos tickets",
       "objetivo": "Apresenta relatorios de tickets com varias filtragem."
+    },
+    {
+      "name": "pesquisa-satisfacao",
+      "titulo": "Pesquisa de Satisfação",
+      "objetivo": "Apresenta médias, notas e respostas da pesquisa de satisfação."
     }
   ]

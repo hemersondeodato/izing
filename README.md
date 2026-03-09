@@ -85,6 +85,8 @@ Seguem links sugerimos:
 -  [Como Instalar o IZING - Video opção 2](https://youtu.be/bZ-jXRtcGyc?si=B8oQxv0V0V36fgrF)
 
 -  [Como Instalar o IZING VPS - Texto - UBUNTU 20, 22](docs/INSTALL_VPS_UBUNTU_20_22.md)
+-  [Deploy em Docker para producao com dominio unico](docs/DEPLOY_DOCKER_PRODUCAO.md)
+-  [Script unico de instalacao Ubuntu](scripts/install_production_ubuntu.sh)
 
 -  [Instalador automatico IZING LOCALHOST](https://github.com/cleitonme/izing.local)
 -  [Instalador automatico](https://github.com/cleitonme/izing.instalador)

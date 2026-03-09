@@ -15,6 +15,7 @@ import VerifyMessage from "./VerifyMessage";
 import verifyBusinessHours from "./VerifyBusinessHours";
 import VerifyStepsChatFlowTicket from "../../ChatFlowServices/VerifyStepsChatFlowTicket";
 import Queue from "../../../libs/Queue";
+import HandleTicketSatisfactionSurveyResponseService from "../../SatisfactionSurveyServices/HandleTicketSatisfactionSurveyResponseService";
 // import isMessageExistsService from "../../MessageServices/isMessageExistsService";
 import Setting from "../../../models/Setting";
 
@@ -82,6 +83,22 @@ const HandleMessage = async (
 
         // const profilePicUrl = await msgContact.getProfilePicUrl();
         const contact = await VerifyContact(msgContact, tenantId);
+
+        if (!chat.isGroup) {
+          const surveyHandled =
+            await HandleTicketSatisfactionSurveyResponseService({
+              msg,
+              contact,
+              tenantId,
+              whatsappId: wbot.id
+            });
+
+          if (surveyHandled) {
+            resolve();
+            return;
+          }
+        }
+
         const ticket = await FindOrCreateTicketService({
           contact,
           whatsappId: wbot.id!,

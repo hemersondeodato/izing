@@ -71,3 +71,11 @@ export function GetDashTicketsQueue (params) {
     params
   })
 }
+
+export function RelatorioPesquisaSatisfacao (params) {
+  return request({
+    url: '/statistics-satisfaction-surveys',
+    method: 'get',
+    params
+  })
+}

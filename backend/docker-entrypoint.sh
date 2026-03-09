@@ -1,6 +1,14 @@
 #!/bin/sh
 
-# Certifique-se de que este script seja executável (chmod +x) antes de usá-lo no Dockerfile
-# Inicie o aplicativo PM2 com as opções desejadas
-# pm2-docker start pm2.config.js
-pm2-docker start ./dist/server.js
+set -eu
+
+echo "Aguardando dependencias..."
+sleep 3
+
+if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+  echo "Aplicando migrations..."
+  npx sequelize-cli db:migrate
+fi
+
+echo "Iniciando backend..."
+exec pm2-docker start ./dist/server.js

@@ -14,6 +14,7 @@ import UpdateTicketService from "../services/TicketServices/UpdateTicketService"
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
 import CreateMessageSystemService from "../services/MessageServices/CreateMessageSystemService";
+import ScheduleTicketSatisfactionSurveyService from "../services/SatisfactionSurveyServices/ScheduleTicketSatisfactionSurveyService";
 import { pupa } from "../utils/pupa";
 
 type IndexQuery = {
@@ -154,14 +155,14 @@ export const update = async (
 
   const ticketData: TicketData = { ...req.body, tenantId };
 
-  const { ticket } = await UpdateTicketService({
+  const { ticket, oldStatus } = await UpdateTicketService({
     ticketData,
     ticketId,
     isTransference,
     userIdRequest
   });
 
-  if (ticket.status === "closed") {
+  if (ticket.status === "closed" && oldStatus !== "closed") {
     const whatsapp = await Whatsapp.findOne({
       where: { id: ticket.whatsappId, tenantId }
     });
@@ -183,6 +184,8 @@ export const update = async (
       await CreateMessageSystemService(messageData);
       ticket.update({ isFarewellMessage: true });
     }
+
+    await ScheduleTicketSatisfactionSurveyService({ ticket });
   }
 
   return res.status(200).json(ticket);
