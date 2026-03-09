@@ -87,6 +87,7 @@ Seguem links sugerimos:
 -  [Como Instalar o IZING VPS - Texto - UBUNTU 20, 22](docs/INSTALL_VPS_UBUNTU_20_22.md)
 -  [Deploy em Docker para producao com dominio unico](docs/DEPLOY_DOCKER_PRODUCAO.md)
 -  [Script unico de instalacao Ubuntu](scripts/install_production_ubuntu.sh)
+-  [Atualizacao em producao sem Docker](docs/UPDATE_PRODUCTION_SEM_DOCKER.md)
 
 -  [Instalador automatico IZING LOCALHOST](https://github.com/cleitonme/izing.local)
 -  [Instalador automatico](https://github.com/cleitonme/izing.instalador)
@@ -95,9 +96,11 @@ Seguem links sugerimos:
 
 ## Atualizando
 
-Tem script "update-izing" para facilitar atualização ele somente funciona se tiver instalado pasta izing.io
+Tem script `scripts/update_production_non_docker.sh` para facilitar atualizacao de instalacoes fora de Docker, com backup antes da mudanca.
 
-sh update-izing
+```bash
+./scripts/update_production_non_docker.sh
+```
 
 <br/>
 
